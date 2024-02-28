@@ -1,0 +1,27 @@
+### Create Users Item
+POST localhost:8080/api/v1/users
+Content-Type: application/json
+
+{
+  "firstname": "Karen",
+  "lastname": "Mirzayan",
+  "date_of_birth": "2004-06-22",
+  "login": "testKaren",
+  "password": "1234"
+}
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 201, "Response status is not 201");
+    });
+%}
+
+### Delete Menu Item
+DELETE localhost:8080/api/v1/users/2
+Content-Type: application/json
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+%}
