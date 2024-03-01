@@ -81,7 +81,7 @@ func (app *application) getUsersHandler(w http.ResponseWriter, r *http.Request) 
 
 func (app *application) updateUsersHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	param := vars["usersId"]
+	param := vars["userId"]
 
 	id, err := strconv.Atoi(param)
 	if err != nil || id < 1 {
