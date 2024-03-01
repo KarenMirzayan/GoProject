@@ -60,81 +60,91 @@ func (app *application) createUsersHandler(w http.ResponseWriter, r *http.Reques
 	app.respondWithJSON(w, http.StatusCreated, users)
 }
 
-//func (app *application) getMenuHandler(w http.ResponseWriter, r *http.Request) {
-//	vars := mux.Vars(r)
-//	param := vars["menuId"]
-//
-//	id, err := strconv.Atoi(param)
-//	if err != nil || id < 1 {
-//		app.respondWithError(w, http.StatusBadRequest, "Invalid menu ID")
-//		return
-//	}
-//
-//	menu, err := app.models.Menus.Get(id)
-//	if err != nil {
-//		app.respondWithError(w, http.StatusNotFound, "404 Not Found")
-//		return
-//	}
-//
-//	app.respondWithJSON(w, http.StatusOK, menu)
-//}
+func (app *application) getUsersHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	param := vars["userId"]
 
-//func (app *application) updateUsersHandler(w http.ResponseWriter, r *http.Request) {
-//	vars := mux.Vars(r)
-//	param := vars["usersId"]
-//
-//	id, err := strconv.Atoi(param)
-//	if err != nil || id < 1 {
-//		app.respondWithError(w, http.Stt atusBadRequest, "Invalid menu ID")
-//		return
-//	}
-//
-//	menu, err := app.models.Menus.Get(id)
-//	if err != nil {
-//		app.respondWithError(w, http.StatusNotFound, "404 Not Found")
-//		return
-//	}
-//
-//	var input struct {
-//		Title          *string `json:"title"`
-//		Description    *string `json:"description"`
-//		NutritionValue *uint   `json:"nutritionValue"`
-//	}
-//
-//	err = app.readJSON(w, r, &input)
-//	if err != nil {
-//		app.respondWithError(w, http.StatusBadRequest, "Invalid request payload")
-//		return
-//	}
-//
-//	if input.Title != nil {
-//		menu.Title = *input.Title
-//	}
-//
-//	if input.Description != nil {
-//		menu.Description = *input.Description
-//	}
-//
-//	if input.NutritionValue != nil {
-//		menu.NutritionValue = *input.NutritionValue
-//	}
-//
-//	err = app.models.Menus.Update(menu)
-//	if err != nil {
-//		app.respondWithError(w, http.StatusInternalServerError, "500 Internal Server Error")
-//		return
-//	}
-//
-//	app.respondWithJSON(w, http.StatusOK, menu)
-//}
+	id, err := strconv.Atoi(param)
+	if err != nil || id < 1 {
+		app.respondWithError(w, http.StatusBadRequest, "Invalid user ID")
+		return
+	}
 
-func (app *application) deleteUsersHandler(w http.ResponseWriter, r *http.Request) {
+	user, err := app.models.Users.Get(id)
+	if err != nil {
+		app.respondWithError(w, http.StatusNotFound, "404 Not Found")
+		return
+	}
+
+	app.respondWithJSON(w, http.StatusOK, user)
+}
+
+func (app *application) updateUsersHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	param := vars["usersId"]
 
 	id, err := strconv.Atoi(param)
 	if err != nil || id < 1 {
-		app.respondWithError(w, http.StatusBadRequest, "Invalid menu ID")
+		app.respondWithError(w, http.StatusBadRequest, "Invalid user ID")
+		return
+	}
+
+	user, err := app.models.Users.Get(id)
+	if err != nil {
+		app.respondWithError(w, http.StatusNotFound, "404 Not Found")
+		return
+	}
+
+	var input struct {
+		First       *string `json:"firstname"`
+		Last        *string `json:"lastname"`
+		DateOfBirth *string `json:"date_of_birth"`
+		Login       *string `json:"login"`
+		Password    *string `json:"password"`
+	}
+
+	err = app.readJSON(w, r, &input)
+	if err != nil {
+		app.respondWithError(w, http.StatusBadRequest, "Invalid request payload")
+		return
+	}
+
+	if input.First != nil {
+		user.First = *input.First
+	}
+
+	if input.Last != nil {
+		user.Last = *input.Last
+	}
+
+	if input.DateOfBirth != nil {
+		user.DateOfBirth = *input.DateOfBirth
+	}
+
+	if input.Login != nil {
+		user.Login = *input.Login
+	}
+
+	if input.Password != nil {
+		user.Password = *input.Password
+	}
+
+	err = app.models.Users.Update(user)
+	if err != nil {
+		app.respondWithError(w, http.StatusInternalServerError, "500 Internal Server Error")
+		return
+	}
+
+	app.respondWithJSON(w, http.StatusOK, user)
+}
+
+func (app *application) deleteUsersHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	param := vars["userId"]
+
+	id, err := strconv.Atoi(param)
+	if err != nil || id < 1 {
+		app.respondWithError(w, http.StatusBadRequest, "Invalid user ID")
 		return
 	}
 
