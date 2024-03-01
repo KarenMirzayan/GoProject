@@ -64,11 +64,11 @@ func (app *application) run() {
 	// Create a new menu
 	v1.HandleFunc("/users", app.createUsersHandler).Methods("POST")
 	// Get a specific menu
-	//v1.HandleFunc("/menus/{userId:[0-9]+}", app.getMenuHandler).Methods("GET")
+	v1.HandleFunc("/users/{userId:[0-9]+}", app.getUsersHandler).Methods("GET")
 	////Update a specific menu
-	//v1.HandleFunc("/menus/{userId:[0-9]+}", app.updateMenuHandler).Methods("PUT")
+	v1.HandleFunc("/users/{userId:[0-9]+}", app.updateUsersHandler).Methods("PUT")
 	// Delete a specific menu
-	v1.HandleFunc("/users/{usersId:[0-9]+}", app.deleteUsersHandler).Methods("DELETE")
+	v1.HandleFunc("/users/{userId:[0-9]+}", app.deleteUsersHandler).Methods("DELETE")
 
 	log.Printf("Starting server on %s\n", app.config.port)
 	err := http.ListenAndServe(app.config.port, r)
