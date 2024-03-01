@@ -85,7 +85,7 @@ func (app *application) createUsersHandler(w http.ResponseWriter, r *http.Reques
 //
 //	id, err := strconv.Atoi(param)
 //	if err != nil || id < 1 {
-//		app.respondWithError(w, http.StatusBadRequest, "Invalid menu ID")
+//		app.respondWithError(w, http.Stt atusBadRequest, "Invalid menu ID")
 //		return
 //	}
 //

@@ -48,7 +48,6 @@ func main() {
 		config: cfg,
 		models: models.NewModels(db),
 	}
-	err = db.Ping()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -61,7 +60,7 @@ func (app *application) run() {
 	v1 := r.PathPrefix("/api/v1").Subrouter()
 
 	// Menu Singleton
-	// Create a new menu
+	// Create a new users
 	v1.HandleFunc("/users", app.createUsersHandler).Methods("POST")
 	// Get a specific menu
 	//v1.HandleFunc("/menus/{userId:[0-9]+}", app.getMenuHandler).Methods("GET")
