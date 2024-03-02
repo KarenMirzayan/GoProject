@@ -32,7 +32,7 @@ type UsersModel struct {
 }
 
 func (m UsersModel) Insert(users *Users) error {
-	// Insert a new menu item into the database.
+	// Insert a new user item into the database.
 	query := `
 		INSERT INTO users (firstname, lastname, date_of_birth, login, password) 
 		VALUES ($1, $2, $3, $4, $5)
@@ -46,7 +46,7 @@ func (m UsersModel) Insert(users *Users) error {
 }
 
 func (m UsersModel) Get(id int) (*Users, error) {
-	// Retrieve a specific menu item based on its ID.
+	// Retrieve a specific user item based on its ID.
 	query := `
 		SELECT user_id, firstname, lastname, date_of_birth, login, password
 		FROM users
@@ -65,7 +65,7 @@ func (m UsersModel) Get(id int) (*Users, error) {
 }
 
 func (m UsersModel) Update(users *Users) error {
-	// Update a specific menu item in the database.
+	// Update a specific user item in the database.
 	query := `
 		UPDATE users
 		SET firstname = $1, lastname = $2, date_of_birth = $3, login = $4, password = $5
@@ -80,7 +80,7 @@ func (m UsersModel) Update(users *Users) error {
 }
 
 func (m UsersModel) Delete(id int) error {
-	// Delete a specific menu item from the database.
+	// Delete a specific user item from the database.
 	query := `
 		DELETE FROM users
 		WHERE users.user_id = $1

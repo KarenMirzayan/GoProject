@@ -62,11 +62,11 @@ func (app *application) run() {
 	// Menu Singleton
 	// Create a new users
 	v1.HandleFunc("/users", app.createUsersHandler).Methods("POST")
-	// Get a specific menu
+	// Get a specific user
 	v1.HandleFunc("/users/{userId:[0-9]+}", app.getUsersHandler).Methods("GET")
-	////Update a specific menu
+	////Update a specific user
 	v1.HandleFunc("/users/{userId:[0-9]+}", app.updateUsersHandler).Methods("PUT")
-	// Delete a specific menu
+	// Delete a specific user
 	v1.HandleFunc("/users/{userId:[0-9]+}", app.deleteUsersHandler).Methods("DELETE")
 
 	log.Printf("Starting server on %s\n", app.config.port)
