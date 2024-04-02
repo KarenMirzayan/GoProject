@@ -7,9 +7,9 @@ import (
 )
 
 type Models struct {
-	Users UsersModel
-	//UserConversations UserConversationsModel
-	//Messages MessagesModel
+	Users         UsersModel
+	Conversations ConversationsModel
+	Messages      MessagesModel
 }
 
 func NewModels(db *sql.DB) Models {
@@ -21,10 +21,15 @@ func NewModels(db *sql.DB) Models {
 			InfoLog:  infoLog,
 			ErrorLog: errorLog,
 		},
-		//Restaurants: RestaurantModel{
-		//	DB:       db,
-		//	InfoLog:  infoLog,
-		//	ErrorLog: errorLog,
-		//},
+		Conversations: ConversationsModel{
+			DB:       db,
+			InfoLog:  infoLog,
+			ErrorLog: errorLog,
+		},
+		Messages: MessagesModel{
+			DB:       db,
+			InfoLog:  infoLog,
+			ErrorLog: errorLog,
+		},
 	}
 }

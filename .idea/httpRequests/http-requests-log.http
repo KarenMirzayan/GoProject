@@ -1,3 +1,149 @@
+PUT http://localhost:8080/api/v1/users/1
+Content-Type: application/json
+Content-Length: 24
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.10)
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+{
+  "password": "aaaa"
+}
+
+<> 2024-03-02T160402.200.json
+
+###
+
+GET http://localhost:8080/api/v1/users/2
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.10)
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+<> 2024-03-02T160350.200.json
+
+###
+
+POST http://localhost:8080/api/v1/users
+Content-Type: application/json
+Content-Length: 121
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.10)
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+{
+  "firstname": "Kim",
+  "lastname": "Anita",
+  "date_of_birth": "2004-09-04",
+  "login": "test",
+  "password": "1234"
+}
+
+<> 2024-03-02T160321.201.json
+
+###
+
+PUT http://localhost:8080/api/v1/users/1
+Content-Type: application/json
+Content-Length: 24
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.10)
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+{
+  "password": "aaaa"
+}
+
+<> 2024-03-01T230738.200.json
+
+###
+
+PUT http://localhost:8080/api/v1/users/1
+Content-Type: application/json
+Content-Length: 25
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.10)
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+{
+  "password": "aaaaa"
+}
+
+<> 2024-03-01T230635.200.json
+
+###
+
+PUT http://localhost:8080/api/v1/users/1
+Content-Type: application/json
+Content-Length: 25
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.10)
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+{
+  "password": "aaaaa"
+}
+
+<> 2024-03-01T230432.400.json
+
+###
+
+PUT http://localhost:8080/api/v1/users/1
+Content-Type: application/json
+Content-Length: 25
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.10)
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+{
+  "password": "aaaaa"
+}
+
+<> 2024-03-01T230343.400.json
+
+###
+
+PUT http://localhost:8080/api/v1/users/1
+Content-Type: application/json
+Content-Length: 25
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.10)
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+{
+  "password": "aaaaa"
+}
+
+<> 2024-03-01T230252.400.json
+
+###
+
+GET http://localhost:8080/api/v1/users/1
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.10)
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+<> 2024-03-01T230138.200.json
+
+###
+
+POST http://localhost:8080/api/v1/users
+Content-Type: application/json
+Content-Length: 131
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.10)
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+{
+  "firstname": "Karen",
+  "lastname": "Mirzayan",
+  "date_of_birth": "2004-06-22",
+  "login": "testKaren",
+  "password": "1234"
+}
+
+<> 2024-03-01T230108.201.json
+
+###
+
 DELETE http://localhost:8080/api/v1/users/2
 Content-Type: application/json
 Connection: Keep-Alive
