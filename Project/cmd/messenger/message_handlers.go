@@ -40,8 +40,8 @@ func (app *application) createMessageHandler(w http.ResponseWriter, r *http.Requ
 
 	// Create a new Message instance with the input data, conversation_id, and generated timestamp
 	message := &models.Messages{
-		ConversationID: conversationID,
-		SenderID:       input.SenderID,
+		ConversationId: conversationID,
+		SenderId:       input.SenderID,
 		Content:        input.Content,
 		Timestamp:      timestamp,
 	}
