@@ -9,13 +9,16 @@ import (
 	"net/http"
 )
 
+import "time"
+
 func (app *application) createMessageHandler(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	conversationID := params["conversationId"]
+
 	// Define a struct to hold JSON input data
 	var input struct {
-		ConversationId string `json:"conversation_id"`
-		SenderId       string `json:"sender_id"`
-		Content        string `json:"content"`
-		Timestamp      string `json:"timestamp"`
+		SenderID string `json:"sender_id"`
+		Content  string `json:"content"`
 	}
 
 	// Read JSON input into the struct
@@ -26,12 +29,21 @@ func (app *application) createMessageHandler(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	// Create a new Message instance with the input data
+	// Extract conversation_id from the request
+	if conversationID == "" {
+		app.errorResponse(w, r, http.StatusBadRequest, "conversation_id is required")
+		return
+	}
+
+	// Generate timestamp
+	timestamp := time.Now().UTC().Format(time.RFC3339)
+
+	// Create a new Message instance with the input data, conversation_id, and generated timestamp
 	message := &models.Messages{
-		ConversationId: input.ConversationId,
-		SenderId:       input.SenderId,
+		ConversationID: conversationID,
+		SenderID:       input.SenderID,
 		Content:        input.Content,
-		Timestamp:      input.Timestamp,
+		Timestamp:      timestamp,
 	}
 
 	// Insert the new message into the database
