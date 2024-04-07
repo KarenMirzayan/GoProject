@@ -157,14 +157,14 @@ func (app *application) deleteUsersHandler(w http.ResponseWriter, r *http.Reques
 	app.respondWithJSON(w, http.StatusOK, map[string]string{"result": "success"})
 }
 
-func (app *application) readJSON(w http.ResponseWriter, r *http.Request, dst interface{}) error {
-	dec := json.NewDecoder(r.Body)
-	dec.DisallowUnknownFields()
-
-	err := dec.Decode(dst)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
+//func (app *application) readJSON(w http.ResponseWriter, r *http.Request, dst interface{}) error {
+//	dec := json.NewDecoder(r.Body)
+//	dec.DisallowUnknownFields()
+//
+//	err := dec.Decode(dst)
+//	if err != nil {
+//		return err
+//	}
+//
+//	return nil
+//}

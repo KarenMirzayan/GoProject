@@ -3,10 +3,12 @@ package main
 import (
 	"database/sql"
 	"flag"
+	"github.com/KarenMirzayan/Project/pkg/jsonlog"
 	"github.com/KarenMirzayan/Project/pkg/messenger/models"
 	"github.com/gorilla/mux"
 	"log"
 	"net/http"
+	"sync"
 
 	_ "github.com/lib/pq"
 )
@@ -22,6 +24,8 @@ type config struct {
 type application struct {
 	config config
 	models models.Models
+	logger *jsonlog.Logger
+	wg     sync.WaitGroup
 }
 
 func main() {
