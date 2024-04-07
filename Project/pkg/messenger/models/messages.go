@@ -3,6 +3,7 @@ package models
 import (
 	"context"
 	"database/sql"
+	"github.com/KarenMirzayan/Project/pkg/messenger/validator"
 	"log"
 	"time"
 )
@@ -80,4 +81,10 @@ func (m MessagesModel) Delete(id int) error {
 
 	_, err := m.DB.ExecContext(ctx, query, id)
 	return err
+}
+
+func ValidateMessage(v *validator.Validator, message *Messages) {
+	// Check if the content field is empty.
+	v.Check(message.Content != "", "content", "must be provided")
+	// Add additional validation rules as needed.
 }
