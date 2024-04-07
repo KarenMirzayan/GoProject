@@ -104,11 +104,13 @@ func (m MessagesModel) GetAll(query string, filters Filters) ([]*Messages, Metad
 	// We use the ILIKE operator for case-insensitive search.
 	// We also use the OFFSET and LIMIT clauses for pagination.
 	sqlQuery := fmt.Sprintf(`
-        SELECT count(*) OVER(), message_id, conversation_id, sender_id, content, timestamp
-        FROM messages
-        WHERE content ILIKE '%%%s%%'
+        SELECT count(*) OVER(), m.message_id, m.conversation_id, m.sender_id, m.content, m.timestamp
+        FROM messages m
+        INNER JOIN conversations c ON m.conversation_id = c.conversation_id
+        WHERE m.content ILIKE '%%%s%%'
+        AND (c.user_id = $1 OR c.friend_id = $1)
         ORDER BY %s %s
-        LIMIT $1 OFFSET $2`, query, filters.sortColumn(), filters.sortDirection())
+        LIMIT $2 OFFSET $3`, query, filters.sortColumn(), filters.sortDirection())
 
 	// Create a context with a timeout.
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)

@@ -73,13 +73,16 @@ func (app *application) run() {
 	// Delete a specific user
 	v1.HandleFunc("/users/{userId:[0-9]+}", app.deleteUsersHandler).Methods("DELETE")
 
+	//Create message in conversation
 	v1.HandleFunc("/users/{userId:[0-9]+}/conversations/{conversationId:[0-9]+}", app.createUsersHandler).Methods("POST")
-	// Get a specific user
-	v1.HandleFunc("/users/{userId:[0-9]+}/conversations/{conversationId:[0-9]+}/messages/{messageId:[0-9]+}", app.getUsersHandler).Methods("GET")
-	////Update a specific user
-	v1.HandleFunc("/users/{userId:[0-9]+}/conversations/{conversationId:[0-9]+}/messages/{messageId:[0-9]+}", app.updateUsersHandler).Methods("PUT")
-	// Delete a specific user
-	v1.HandleFunc("/users/{userId:[0-9]+}/conversations/{conversationId:[0-9]+}/messages/{messageId:[0-9]+}", app.deleteUsersHandler).Methods("DELETE")
+	// Get a specific message
+	v1.HandleFunc("/users/{userId:[0-9]+}/conversations/{conversationId:[0-9]+}/messages/{messageId:[0-9]+}", app.getMessageHandler).Methods("GET")
+	//Update a specific message
+	v1.HandleFunc("/users/{userId:[0-9]+}/conversations/{conversationId:[0-9]+}/messages/{messageId:[0-9]+}", app.updateMessageHandler).Methods("PUT")
+	// Delete a specific message
+	v1.HandleFunc("/users/{userId:[0-9]+}/conversations/{conversationId:[0-9]+}/messages/{messageId:[0-9]+}", app.deleteMessageHandler).Methods("DELETE")
+	// Get all messages of conversation
+	v1.HandleFunc("/users/{userId:[0-9]+}/conversations/{conversationId:[0-9]+}", app.getMessagesList).Methods("Get")
 
 	log.Printf("Starting server on %s\n", app.config.port)
 	err := http.ListenAndServe(app.config.port, r)
