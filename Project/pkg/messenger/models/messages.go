@@ -37,18 +37,18 @@ func (m MessagesModel) Insert(messages *Messages) error {
 	return m.DB.QueryRowContext(ctx, query, args...).Scan(&messages.ConversationId, &messages.SenderId, &messages.Content, &messages.Timestamp)
 }
 
-func (m MessagesModel) Get(id int) (*Messages, error) {
-	// Retrieve a specific menu item based on its ID.
+func (m MessagesModel) Get(conversationID, senderID, messageID string) (*Messages, error) {
 	query := `
-		SELECT message_id, conversation_id, sender_id, content, timestamp
-		FROM messages
-		WHERE message_id = $1;
-		`
+		SELECT m.message_id, m.conversation_id, m.sender_id, m.content, m.timestamp
+		FROM messages m
+		INNER JOIN conversations c ON m.conversation_id = c.conversation_id
+		WHERE m.conversation_id = $1 AND m.message_id = $2 AND (c.user_id = $3 OR c.friend_id = $3);
+	`
 	var messages Messages
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
-	row := m.DB.QueryRowContext(ctx, query, id)
+	row := m.DB.QueryRowContext(ctx, query, conversationID, senderID, messageID)
 	err := row.Scan(&messages.MessageId, &messages.ConversationId, &messages.SenderId, &messages.Content, &messages.Timestamp)
 	if err != nil {
 		return nil, err
@@ -59,28 +59,37 @@ func (m MessagesModel) Get(id int) (*Messages, error) {
 func (m MessagesModel) Update(messages *Messages) error {
 	// Update a specific menu item in the database.
 	query := `
-		UPDATE messages
-		SET conversation_id = $1, sender_id = $2, content = $3, timestamp = $4
-		WHERE message_id = $6
-		RETURNING conversation_id, sender_id, content, timestamp
-		`
-	args := []interface{}{messages.MessageId, messages.ConversationId, messages.SenderId, messages.Content, messages.Timestamp}
+		UPDATE messages m
+		SET content = $1
+		FROM conversations c
+		WHERE m.conversation_id = c.conversation_id 
+		AND m.conversation_id = $2 
+		AND m.message_id = $3
+		AND (c.user_id = $4 OR c.friend_id = $4)
+		RETURNING m.message_id, m.conversation_id, m.sender_id, m.content, m.timestamp
+	`
+	args := []interface{}{messages.Content, messages.ConversationId, messages.SenderId, messages.MessageId}
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
-	return m.DB.QueryRowContext(ctx, query, args...).Scan(&messages.ConversationId, &messages.SenderId, &messages.Content, &messages.Timestamp)
+	row := m.DB.QueryRowContext(ctx, query, args...)
+	err := row.Scan(&messages.MessageId, &messages.ConversationId, &messages.SenderId, &messages.Content, &messages.Timestamp)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
-func (m MessagesModel) Delete(id int) error {
+func (m MessagesModel) Delete(conversationID, senderID, messageID string) error {
 	// Delete a specific menu item from the database.
 	query := `
 		DELETE FROM messages
-		WHERE messages.message_id = $1
-		`
+		WHERE conversation_id = $1 AND sender_id = $2 AND (c.user_id = $3 OR c.friend_id = $3);
+	`
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
-	_, err := m.DB.ExecContext(ctx, query, id)
+	_, err := m.DB.ExecContext(ctx, query, conversationID, senderID, messageID)
 	return err
 }
 

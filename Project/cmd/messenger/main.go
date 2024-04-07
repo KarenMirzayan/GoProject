@@ -73,6 +73,14 @@ func (app *application) run() {
 	// Delete a specific user
 	v1.HandleFunc("/users/{userId:[0-9]+}", app.deleteUsersHandler).Methods("DELETE")
 
+	v1.HandleFunc("/users/{userId:[0-9]+}/conversations/{conversationId:[0-9]+}", app.createUsersHandler).Methods("POST")
+	// Get a specific user
+	v1.HandleFunc("/users/{userId:[0-9]+}/conversations/{conversationId:[0-9]+}/messages/{messageId:[0-9]+}", app.getUsersHandler).Methods("GET")
+	////Update a specific user
+	v1.HandleFunc("/users/{userId:[0-9]+}/conversations/{conversationId:[0-9]+}/messages/{messageId:[0-9]+}", app.updateUsersHandler).Methods("PUT")
+	// Delete a specific user
+	v1.HandleFunc("/users/{userId:[0-9]+}/conversations/{conversationId:[0-9]+}/messages/{messageId:[0-9]+}", app.deleteUsersHandler).Methods("DELETE")
+
 	log.Printf("Starting server on %s\n", app.config.port)
 	err := http.ListenAndServe(app.config.port, r)
 	log.Fatal(err)

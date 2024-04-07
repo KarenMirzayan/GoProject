@@ -4,6 +4,7 @@ import (
 	"errors"
 	"github.com/KarenMirzayan/Project/pkg/messenger/models"
 	"github.com/KarenMirzayan/Project/pkg/messenger/validator"
+	"github.com/gorilla/mux"
 	"log"
 	"net/http"
 )
@@ -45,16 +46,14 @@ func (app *application) createMessageHandler(w http.ResponseWriter, r *http.Requ
 }
 
 func (app *application) getMessageHandler(w http.ResponseWriter, r *http.Request) {
-	// Extract message ID from request parameters
-	id, err := app.readIDParam(r)
-	if err != nil {
-		// If error encountered while reading ID, respond with 404 Not Found
-		app.notFoundResponse(w, r)
-		return
-	}
+	// Extract parameters from the request URL
+	params := mux.Vars(r)
+	userID := params["userId"]
+	conversationID := params["conversationId"]
+	messageID := params["id"]
 
-	// Query the database for the menu using its ID
-	message, err := app.models.Messages.Get(id)
+	// Query the database for the message using its IDs
+	message, err := app.models.Messages.Get(conversationID, userID, messageID)
 	if err != nil {
 		// Handle different error scenarios
 		switch {
@@ -71,15 +70,14 @@ func (app *application) getMessageHandler(w http.ResponseWriter, r *http.Request
 }
 
 func (app *application) updateMessageHandler(w http.ResponseWriter, r *http.Request) {
-	// Extract message ID from request parameters
-	id, err := app.readIDParam(r)
-	if err != nil {
-		app.notFoundResponse(w, r)
-		return
-	}
+	// Extract parameters from the request URL
+	params := mux.Vars(r)
+	userID := params["userId"]
+	conversationID := params["conversationId"]
+	messageID := params["id"]
 
-	// Query the database for the message using its ID
-	message, err := app.models.Messages.Get(id)
+	// Query the database for the message using its IDs
+	message, err := app.models.Messages.Get(conversationID, userID, messageID)
 	if err != nil {
 		switch {
 		case errors.Is(err, models.ErrRecordNotFound):
@@ -131,15 +129,14 @@ func (app *application) updateMessageHandler(w http.ResponseWriter, r *http.Requ
 }
 
 func (app *application) deleteMessageHandler(w http.ResponseWriter, r *http.Request) {
-	// Extract message ID from request parameters
-	id, err := app.readIDParam(r)
-	if err != nil {
-		app.notFoundResponse(w, r)
-		return
-	}
+	// Extract parameters from the request URL
+	params := mux.Vars(r)
+	userID := params["userId"]
+	conversationID := params["conversationId"]
+	messageID := params["id"]
 
 	// Delete the message from the database
-	err = app.models.Messages.Delete(id)
+	err := app.models.Messages.Delete(conversationID, userID, messageID)
 	if err != nil {
 		switch {
 		case errors.Is(err, models.ErrRecordNotFound):
