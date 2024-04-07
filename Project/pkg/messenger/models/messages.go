@@ -90,7 +90,7 @@ func ValidateMessage(v *validator.Validator, message *Messages) {
 	// Add additional validation rules as needed.
 }
 
-func (m MessagesModel) GetAll(query string, from, to int, filters Filters) ([]*Messages, Metadata, error) {
+func (m MessagesModel) GetAll(query string, filters Filters) ([]*Messages, Metadata, error) {
 	// Construct the SQL query for retrieving messages with content containing the query string.
 	// We use the ILIKE operator for case-insensitive search.
 	// We also use the OFFSET and LIMIT clauses for pagination.
