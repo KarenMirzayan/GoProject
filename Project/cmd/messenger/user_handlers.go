@@ -2,20 +2,10 @@ package main
 
 import (
 	"errors"
+	"github.com/KarenMirzayan/Project/pkg/messenger/models"
 	"github.com/KarenMirzayan/Project/pkg/messenger/validator"
 	"net/http"
 	"time"
-)
-
-package main
-
-import (
-"errors"
-"net/http"
-"time"
-
-"github.com/codev0/inft3212-6/pkg/abr-plus/model"
-"github.com/codev0/inft3212-6/pkg/abr-plus/validator"
 )
 
 func (app *application) registerUserHandler(w http.ResponseWriter, r *http.Request) {
@@ -37,7 +27,7 @@ func (app *application) registerUserHandler(w http.ResponseWriter, r *http.Reque
 	// we set the Activated field to false, which isn't strictly necessary because
 	// the Activated field will have the zero-value of false by default. But setting
 	// this explicitly helps to make our intentions clear to anyone reading the code.
-	user := &model.User{
+	user := &models.User{
 		Name:  input.Name,
 		Email: input.Email,
 	}
@@ -54,7 +44,7 @@ func (app *application) registerUserHandler(w http.ResponseWriter, r *http.Reque
 
 	// Validate the user struct and return the error messages to the client if
 	// any of the checks fail.
-	if model.ValidateUser(v, user); !v.Valid() {
+	if models.ValidateUser(v, user); !v.Valid() {
 		app.failedValidationResponse(w, r, v.Errors)
 		return
 	}
@@ -66,7 +56,7 @@ func (app *application) registerUserHandler(w http.ResponseWriter, r *http.Reque
 		// If we get an ErrDuplicateEmail error, use the v.AddError() method to manually add
 		// a message to the validator instance, and then call our failedValidationResponse
 		// helper().
-		case errors.Is(err, model.ErrDuplicateEmail):
+		case errors.Is(err, models.ErrDuplicateEmail):
 			v.AddError("email", "a user with this email address already exists")
 
 			app.failedValidationResponse(w, r, v.Errors)
@@ -84,15 +74,15 @@ func (app *application) registerUserHandler(w http.ResponseWriter, r *http.Reque
 
 	// After the user record has been created in the database, generate a new activation
 	// token for the user.
-	token, err := app.models.Tokens.New(user.ID, 3*24*time.Hour, model.ScopeActivation)
+	token, err := app.models.Tokens.New(user.ID, 3*24*time.Hour, models.ScopeActivation)
 	if err != nil {
 		app.serverErrorResponse(w, r, err)
 		return
 	}
 
 	var res struct {
-		Token *string     `json:"token"`
-		User  *model.User `json:"user"`
+		Token *string      `json:"token"`
+		User  *models.User `json:"user"`
 	}
 
 	res.Token = &token.Plaintext
@@ -118,7 +108,7 @@ func (app *application) activateUserHandler(w http.ResponseWriter, r *http.Reque
 	// Validate the plaintext token provided by the client.
 	v := validator.New()
 
-	if model.ValidateTokenPlaintext(v, input.TokenPlaintext); !v.Valid() {
+	if models.ValidateTokenPlaintext(v, input.TokenPlaintext); !v.Valid() {
 		app.failedValidationResponse(w, r, v.Errors)
 		return
 	}
@@ -146,7 +136,7 @@ func (app *application) activateUserHandler(w http.ResponseWriter, r *http.Reque
 	err = app.models.Users.Update(user)
 	if err != nil {
 		switch {
-		case errors.Is(err, model.ErrEditConflict):
+		case errors.Is(err, models.ErrEditConflict):
 			app.editConflictResponse(w, r)
 		default:
 			app.serverErrorResponse(w, r, err)
@@ -155,7 +145,7 @@ func (app *application) activateUserHandler(w http.ResponseWriter, r *http.Reque
 	}
 
 	// If everything went successfully above, then delete all activation tokens for the user.
-	err = app.models.Tokens.DeleteAllForUser(model.ScopeActivation, user.ID)
+	err = app.models.Tokens.DeleteAllForUser(models.ScopeActivation, user.ID)
 	if err != nil {
 		app.serverErrorResponse(w, r, err)
 		return

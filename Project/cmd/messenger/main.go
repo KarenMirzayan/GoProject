@@ -5,12 +5,14 @@ import (
 	"flag"
 	"github.com/KarenMirzayan/Project/pkg/jsonlog"
 	"github.com/KarenMirzayan/Project/pkg/messenger/models"
-	"github.com/gorilla/mux"
-	"log"
-	"net/http"
+	"os"
 	"sync"
 
 	_ "github.com/lib/pq"
+)
+
+var (
+	version = vcs.Version()
 )
 
 type config struct {
@@ -35,72 +37,42 @@ func main() {
 	flag.StringVar(&cfg.db.dsn, "db-dsn", "postgres://beezy:2202264mir@localhost/messenger?sslmode=disable", "PostgreSQL DSN")
 	flag.Parse()
 
+	// Init logger
+	logger := jsonlog.NewLogger(os.Stdout, jsonlog.LevelInfo)
+
 	// Connect to DB
 	db, err := openDB(cfg)
 	if err != nil {
-		log.Fatal(err)
+		logger.PrintError(err, nil)
 		return
 	}
-	defer func(db *sql.DB) {
-		err := db.Close()
-		if err != nil {
-			log.Fatal(err)
+	// Defer a call to db.Close() so that the connection pool is closed before the main()
+	// function exits.
+	defer func() {
+		if err := db.Close(); err != nil {
+			logger.PrintFatal(err, nil)
 		}
-	}(db)
+	}()
 
 	app := &application{
 		config: cfg,
 		models: models.NewModels(db),
+		logger: logger,
 	}
-	if err != nil {
-		log.Fatal(err)
+
+	// Call app.server() to start the server.
+	if err := app.serve(); err != nil {
+		logger.PrintFatal(err, nil)
 	}
-	app.run()
-}
-
-func (app *application) run() {
-	r := mux.NewRouter()
-
-	v1 := r.PathPrefix("/api/v1").Subrouter()
-
-	// Menu Singleton
-	// Create a new users
-	v1.HandleFunc("/users", app.createUsersHandler).Methods("POST")
-	// Get a specific user
-	v1.HandleFunc("/users/{userId:[0-9]+}", app.getUsersHandler).Methods("GET")
-	////Update a specific user
-	v1.HandleFunc("/users/{userId:[0-9]+}", app.updateUsersHandler).Methods("PUT")
-	// Delete a specific user
-	v1.HandleFunc("/users/{userId:[0-9]+}", app.deleteUsersHandler).Methods("DELETE")
-
-	//Create conversation
-	v1.HandleFunc("/users/{userId:[0-9]+}/conversations", app.createConversationHandler).Methods("POST")
-	// Get a conversation
-	v1.HandleFunc("/users/{userId:[0-9]+}/conversations/{conversationId:[0-9]+}", app.getConversationHandler).Methods("GET")
-	// Delete a specific conversation
-	v1.HandleFunc("/users/{userId:[0-9]+}/conversations/{conversationId:[0-9]+}", app.deleteConversationHandler).Methods("DELETE")
-	// Get all conversations (with filtering)
-	v1.HandleFunc("/users/{userId:[0-9]+}/conversations", app.getConversationsHandler).Methods("GET")
-
-	//Create message in conversation
-	v1.HandleFunc("/users/{userId:[0-9]+}/conversations/{conversationId:[0-9]+}/messages", app.createMessageHandler).Methods("POST")
-	// Get a specific message
-	v1.HandleFunc("/users/{userId:[0-9]+}/conversations/{conversationId:[0-9]+}/messages/{messageId:[0-9]+}", app.getMessageHandler).Methods("GET")
-	//Update a specific message
-	v1.HandleFunc("/users/{userId:[0-9]+}/conversations/{conversationId:[0-9]+}/messages/{messageId:[0-9]+}", app.updateMessageHandler).Methods("PUT")
-	// Delete a specific message
-	v1.HandleFunc("/users/{userId:[0-9]+}/conversations/{conversationId:[0-9]+}/messages/{messageId:[0-9]+}", app.deleteMessageHandler).Methods("DELETE")
-	// Get all messages of conversation
-	v1.HandleFunc("/users/{userId:[0-9]+}/conversations/{conversationId:[0-9]+}/messages", app.getMessagesList).Methods("GET")
-
-	log.Printf("Starting server on %s\n", app.config.port)
-	err := http.ListenAndServe(app.config.port, r)
-	log.Fatal(err)
 }
 
 func openDB(cfg config) (*sql.DB, error) {
 	// Use sql.Open() to create an empty connection pool, using the DSN from the config // struct.
 	db, err := sql.Open("postgres", cfg.db.dsn)
+	if err != nil {
+		return nil, err
+	}
+	err = db.Ping()
 	if err != nil {
 		return nil, err
 	}
