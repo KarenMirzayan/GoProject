@@ -12,7 +12,7 @@ import (
 type Messages struct {
 	MessageId      string `json:"message_id"`
 	ConversationId string `json:"conversation_id"`
-	SenderId       string `json:"sender_id"`
+	SenderId       int    `json:"sender_id"`
 	Content        string `json:"content"`
 	Timestamp      string `json:"timestamp"`
 }
@@ -27,14 +27,14 @@ func (m MessagesModel) Insert(messages *Messages) error {
 	// Insert a new menu item into the database.
 	query := `
 		INSERT INTO messages (conversation_id, sender_id, content, timestamp) 
-		VALUES ($1, $2, $3, $4, $5)
-		RETURNING message_id, conversation_id, sender_id,content, timestamp;
+		VALUES ($1, $2, $3, $4)
+		RETURNING message_id, conversation_id, sender_id, content, timestamp;
 		`
 	args := []interface{}{messages.ConversationId, messages.SenderId, messages.Content, messages.Timestamp}
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
-	return m.DB.QueryRowContext(ctx, query, args...).Scan(&messages.ConversationId, &messages.SenderId, &messages.Content, &messages.Timestamp)
+	return m.DB.QueryRowContext(ctx, query, args...).Scan(&messages.MessageId, &messages.ConversationId, &messages.SenderId, &messages.Content, &messages.Timestamp)
 }
 
 func (m MessagesModel) Get(conversationID, senderID, messageID string) (*Messages, error) {
@@ -99,25 +99,25 @@ func ValidateMessage(v *validator.Validator, message *Messages) {
 	// Add additional validation rules as needed.
 }
 
-func (m MessagesModel) GetAll(query string, filters Filters) ([]*Messages, Metadata, error) {
+func (m MessagesModel) GetAll(userId, conversationId int, query string, filters Filters) ([]*Messages, Metadata, error) {
 	// Construct the SQL query for retrieving messages with content containing the query string.
 	// We use the ILIKE operator for case-insensitive search.
 	// We also use the OFFSET and LIMIT clauses for pagination.
 	sqlQuery := fmt.Sprintf(`
         SELECT count(*) OVER(), m.message_id, m.conversation_id, m.sender_id, m.content, m.timestamp
         FROM messages m
-        INNER JOIN conversations c ON m.conversation_id = c.conversation_id
-        WHERE m.content ILIKE '%%%s%%'
-        AND (c.user_id = $1 OR c.friend_id = $1)
+        INNER JOIN user_conversations c ON m.conversation_id = c.conversation_id
+        WHERE m.content ILIKE '%%%s%%' AND m.conversation_id = $1
+        AND (c.user_id = $2 OR c.friend_id = $2)
         ORDER BY %s %s
-        LIMIT $2 OFFSET $3`, query, filters.sortColumn(), filters.sortDirection())
+        LIMIT $3 OFFSET $4`, query, filters.sortColumn(), filters.sortDirection())
 
 	// Create a context with a timeout.
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
 	// Execute the query and retrieve the result set.
-	rows, err := m.DB.QueryContext(ctx, sqlQuery, filters.limit(), filters.offset())
+	rows, err := m.DB.QueryContext(ctx, sqlQuery, conversationId, userId, filters.limit(), filters.offset())
 	if err != nil {
 		return nil, Metadata{}, err
 	}

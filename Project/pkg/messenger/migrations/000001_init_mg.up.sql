@@ -3,7 +3,7 @@ create table if not exists users (
                                      firstname text not null,
                                      lastname text not null,
                                      date_of_birth date not null,
-                                     login varchar(16) not null,
+                                     login varchar(16) not null unique,
                                      password varchar(16) not null
 );
 

@@ -7,6 +7,7 @@ import (
 	"github.com/gorilla/mux"
 	"log"
 	"net/http"
+	"strconv"
 )
 
 import "time"
@@ -17,7 +18,7 @@ func (app *application) createMessageHandler(w http.ResponseWriter, r *http.Requ
 
 	// Define a struct to hold JSON input data
 	var input struct {
-		SenderID string `json:"sender_id"`
+		SenderID int    `json:"sender_id"`
 		Content  string `json:"content"`
 	}
 
@@ -165,6 +166,17 @@ func (app *application) deleteMessageHandler(w http.ResponseWriter, r *http.Requ
 
 func (app *application) getMessagesList(w http.ResponseWriter, r *http.Request) {
 	// Define a struct to hold input parameters and filters
+	params := mux.Vars(r)
+	userID, err := strconv.Atoi(params["userId"])
+	if err != nil {
+		app.errorResponse(w, r, http.StatusBadRequest, "Invalid user ID")
+		return
+	}
+	conversationID, err := strconv.Atoi(params["conversationId"])
+	if err != nil {
+		app.errorResponse(w, r, http.StatusBadRequest, "Invalid conversation ID")
+		return
+	}
 	var input struct {
 		Query          string
 		models.Filters // Embedding Filters struct for pagination and sorting
@@ -190,7 +202,7 @@ func (app *application) getMessagesList(w http.ResponseWriter, r *http.Request) 
 	}
 
 	// Get messages based on input parameters and filters
-	messages, metadata, err := app.models.Messages.GetAll(input.Query, input.Filters)
+	messages, metadata, err := app.models.Messages.GetAll(userID, conversationID, input.Query, input.Filters)
 	if err != nil {
 		app.serverErrorResponse(w, r, err)
 		return

@@ -26,7 +26,7 @@ func (app *application) getConversationsHandler(w http.ResponseWriter, r *http.R
 		Page:         app.readInt(qs, "page", 1, v),
 		PageSize:     app.readInt(qs, "page_size", 10, v),
 		Sort:         app.readStrings(qs, "sort", "conversation_id"),
-		SortSafeList: []string{"conversation_id"},
+		SortSafeList: []string{"conversation_id", "-conversation_id"},
 	}
 
 	// Retrieve conversations from the database with pagination
