@@ -52,7 +52,7 @@ func (app *application) authenticate(next http.Handler) http.Handler {
 
 		// Retrieve the details of the user associated with the authentication token.
 		// call invalidAuthenticationTokenResponse if no matching record was found.
-		user, err := app.models.Users.GetForToken(model.ScopeAuthentication, token)
+		user, err := app.models.Users.GetForToken(models.ScopeAuthentication, token)
 		if err != nil {
 			switch {
 			case errors.Is(err, models.ErrRecordNotFound):

@@ -15,7 +15,8 @@ create table if not exists user_conversations (
                                     user_id int,
                                     friend_id int,
                                     foreign key (user_id) references users(user_id),
-                                    foreign key (friend_id) references users(user_id)
+                                    foreign key (friend_id) references users(user_id),
+                                    constraint unique_conversation unique (user_id, friend_id)
 );
 
 create table if not exists messages (

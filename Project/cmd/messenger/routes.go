@@ -23,7 +23,7 @@ func (app *application) routes() http.Handler {
 	v1 := r.PathPrefix("/api/v1").Subrouter()
 
 	//Create conversation
-	v1.HandleFunc("/users/{userId:[0-9]+}/conversations", app.createConversationHandler).Methods("POST")
+	v1.HandleFunc("/users/{userId:[0-9]+}/conversations", app.requirePermissions("conversation:write", app.createConversationHandler)).Methods("POST")
 	// Get a conversation
 	v1.HandleFunc("/users/{userId:[0-9]+}/conversations/{conversationId:[0-9]+}", app.getConversationHandler).Methods("GET")
 	// Delete a specific conversation

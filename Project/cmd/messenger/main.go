@@ -17,7 +17,7 @@ var (
 )
 
 type config struct {
-	port string
+	port int
 	env  string
 	db   struct {
 		dsn string
@@ -33,7 +33,7 @@ type application struct {
 
 func main() {
 	var cfg config
-	flag.StringVar(&cfg.port, "port", ":8080", "API server port")
+	flag.IntVar(&cfg.port, "port", 8080, "API server port")
 	flag.StringVar(&cfg.env, "env", "development", "Environment (development|staging|production)")
 	flag.StringVar(&cfg.db.dsn, "db-dsn", "postgres://beezy:2202264mir@localhost/messenger?sslmode=disable", "PostgreSQL DSN")
 	flag.Parse()

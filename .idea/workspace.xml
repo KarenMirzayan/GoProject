@@ -10,10 +10,11 @@
       <change beforePath="$PROJECT_DIR$/.idea/dataSources/07ccae91-3194-4b35-8ae1-2076ddfea1e6/storage_v2/_src_/database/messenger.E7tmqg/schema/pg_catalog.0S1ZNQ.meta" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/07ccae91-3194-4b35-8ae1-2076ddfea1e6/storage_v2/_src_/database/messenger.E7tmqg/schema/pg_catalog.0S1ZNQ.meta" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/dataSources/07ccae91-3194-4b35-8ae1-2076ddfea1e6/storage_v2/_src_/database/messenger.E7tmqg/schema/public.abK9xQ.meta" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/07ccae91-3194-4b35-8ae1-2076ddfea1e6/storage_v2/_src_/database/messenger.E7tmqg/schema/public.abK9xQ.meta" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Project/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/Project/go.mod" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Project/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/Project/go.sum" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Project/pkg/messenger/models/model.go" beforeDir="false" afterPath="$PROJECT_DIR$/Project/pkg/messenger/models/model.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Project/pkg/messenger/models/users.go" beforeDir="false" afterPath="$PROJECT_DIR$/Project/pkg/messenger/models/users.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Project/cmd/messenger/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/Project/cmd/messenger/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Project/cmd/messenger/middleware.go" beforeDir="false" afterPath="$PROJECT_DIR$/Project/cmd/messenger/middleware.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Project/cmd/messenger/routes.go" beforeDir="false" afterPath="$PROJECT_DIR$/Project/cmd/messenger/routes.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Project/cmd/messenger/user_handlers.go" beforeDir="false" afterPath="$PROJECT_DIR$/Project/cmd/messenger/user_handlers.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Project/pkg/messenger/migrations/000001_init_mg.up.sql" beforeDir="false" afterPath="$PROJECT_DIR$/Project/pkg/messenger/migrations/000001_init_mg.up.sql" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
