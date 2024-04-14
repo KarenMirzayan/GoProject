@@ -116,10 +116,10 @@ func (app *application) activateUserHandler(w http.ResponseWriter, r *http.Reque
 	// Retrieve the details of the user associated with the token using the GetForToken() method.
 	// If no matching record is found, then we let the client know that the token they provided
 	// is not valid.
-	user, err := app.models.Users.GetForToken(model.ScopeActivation, input.TokenPlaintext)
+	user, err := app.models.Users.GetForToken(models.ScopeActivation, input.TokenPlaintext)
 	if err != nil {
 		switch {
-		case errors.Is(err, model.ErrRecordNotFound):
+		case errors.Is(err, models.ErrRecordNotFound):
 			v.AddError("token", "invalid or expired activation token")
 			app.failedValidationResponse(w, r, v.Errors)
 		default:

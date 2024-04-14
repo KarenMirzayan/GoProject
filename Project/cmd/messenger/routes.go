@@ -27,7 +27,7 @@ func (app *application) routes() http.Handler {
 	// Get a conversation
 	v1.HandleFunc("/users/{userId:[0-9]+}/conversations/{conversationId:[0-9]+}", app.getConversationHandler).Methods("GET")
 	// Delete a specific conversation
-	v1.HandleFunc("/users/{userId:[0-9]+}/conversations/{conversationId:[0-9]+}", app.deleteConversationHandler).Methods("DELETE")
+	v1.HandleFunc("/users/{userId:[0-9]+}/conversations/{conversationId:[0-9]+}", app.requirePermissions("conversation:write", app.deleteConversationHandler)).Methods("DELETE")
 	// Get all conversations (with filtering)
 	v1.HandleFunc("/users/{userId:[0-9]+}/conversations", app.getConversationsHandler).Methods("GET")
 

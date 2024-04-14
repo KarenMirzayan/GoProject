@@ -20,6 +20,7 @@ type Models struct {
 	Conversations ConversationsModel
 	Messages      MessagesModel
 	Tokens        TokenModel
+	Permissions   PermissionModel
 }
 
 func NewModels(db *sql.DB) Models {
@@ -42,6 +43,11 @@ func NewModels(db *sql.DB) Models {
 			ErrorLog: errorLog,
 		},
 		Tokens: TokenModel{
+			DB:       db,
+			InfoLog:  infoLog,
+			ErrorLog: errorLog,
+		},
+		Permissions: PermissionModel{
 			DB:       db,
 			InfoLog:  infoLog,
 			ErrorLog: errorLog,
