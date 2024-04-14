@@ -5,6 +5,7 @@ import (
 	"flag"
 	"github.com/KarenMirzayan/Project/pkg/jsonlog"
 	"github.com/KarenMirzayan/Project/pkg/messenger/models"
+	"github.com/KarenMirzayan/Project/pkg/vcs"
 	"os"
 	"sync"
 

@@ -2,6 +2,7 @@ package models
 
 import (
 	"context"
+	"crypto/sha256"
 	"database/sql"
 	"errors"
 	"github.com/KarenMirzayan/Project/pkg/messenger/validator"
@@ -14,10 +15,11 @@ var (
 	ErrDuplicateEmail = errors.New("duplicate email")
 )
 
-// User Define a User struct to represent an individual user. Importantly, notice how we are
-// using the json:"-" struct tag to prevent the Password and Version fields appearing in
-// any output when we encode it to JSON. Also notice that the Password field uses the
-// custom password type defined below.
+var AnonymousUser = &User{}
+
+// User type whose fields describe a user. Note, that we use the json:"-" struct tag to prevent
+// the Password and Version fields from appearing in any output when we encode it to JSON.
+// Also, notice that the Password field uses the custom password type defined below.
 type User struct {
 	ID        int64     `json:"id"`
 	CreatedAt time.Time `json:"created_at"`
@@ -28,10 +30,22 @@ type User struct {
 	Version   int       `json:"-"`
 }
 
-// Create a custom password type which is a struct containing the plaintext and hashed
-// versions of the password for a user. The plaintext field is a *pointer* to a string,
-// so that we're able to distinguish between a plaintext password not being present in
-// the struct at all, versus a plaintext password which is the empty string "".
+func (u *User) IsAnonymous() bool {
+	return u == AnonymousUser
+}
+
+// UserModel struct wraps a sql.DB connection pool and allows us to work with the User struct type
+// and the users table in our database.
+type UsersModel struct {
+	DB       *sql.DB
+	InfoLog  *log.Logger
+	ErrorLog *log.Logger
+}
+
+// password tyep is a struct containing the plaintext and hashed version of a password for a User.
+// The plaintext field is a *pointer* to a string, so that we're able to distinguish between a
+// plaintext password not being present in the struct at all, versus a plaintext password which
+// is the empty string "".
 type password struct {
 	plaintext *string
 	hash      []byte
@@ -193,4 +207,59 @@ RETURNING version`
 		}
 	}
 	return nil
+}
+
+// GetForToken retrieves a user record from the users table for an associated token and token scope.
+func (m UserModel) GetForToken(tokenScope, tokenPlaintext string) (*User, error) {
+	// Calculate the SHA-256 hash for the plaintext token provided by the client.
+	// Note, that this will return a byte *array* with length 32, not a slice.
+	tokenHash := sha256.Sum256([]byte(tokenPlaintext))
+
+	query := `
+		SELECT 
+			users.id, users.created_at, users.name, users.email, 
+			users.password_hash, users.activated, users.version
+		FROM       users
+        INNER JOIN tokens
+			ON users.id = tokens.user_id
+        WHERE tokens.hash = $1  --<-- Note: this is potentially vulnerable to a timing attack, 
+            -- but if successful the attacker would only be able to retrieve a *hashed* token 
+            -- which would still require a brute-force attack to find the 26 character string
+            -- that has the same SHA-256 hash that was found from our database. 
+			AND tokens.scope = $2
+			AND tokens.expiry > $3
+		`
+
+	// Create a slice containing the query args. Note, that we use the [:] operator to get a slice
+	// containing the token hash, since the pq driver does not support passing in an array.
+	// Also, we pass the current time as the value to check against the token expiry.
+	args := []interface{}{tokenHash[:], tokenScope, time.Now()}
+
+	var user User
+
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	// Execute the query, scanning the return values into a User struct. If no matching record
+	// is found we return an ErrRecordNotFound error.
+	err := m.DB.QueryRowContext(ctx, query, args...).Scan(
+		&user.ID,
+		&user.CreatedAt,
+		&user.Name,
+		&user.Email,
+		&user.Password.hash,
+		&user.Activated,
+		&user.Version,
+	)
+	if err != nil {
+		switch {
+		case errors.Is(err, sql.ErrNoRows):
+			return nil, ErrRecordNotFound
+		default:
+			return nil, err
+		}
+	}
+
+	// Return the matching user.
+	return &user, nil
 }

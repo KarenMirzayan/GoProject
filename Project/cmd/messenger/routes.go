@@ -42,6 +42,9 @@ func (app *application) routes() http.Handler {
 	// Get all messages of conversation
 	v1.HandleFunc("/users/{userId:[0-9]+}/conversations/{conversationId:[0-9]+}/messages", app.getMessagesList).Methods("GET")
 
+	v1.HandleFunc("/users", app.registerUserHandler).Methods("POST")
+	v1.HandleFunc("/users/activated", app.activateUserHandler).Methods("PUT")
+	v1.HandleFunc("/users/login", app.createAuthenticationTokenHandler).Methods("POST")
 	// Wrap the router with the panic recovery middleware and rate limit middleware.
 	return app.authenticate(r)
 }
