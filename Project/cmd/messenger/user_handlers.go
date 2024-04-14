@@ -1,170 +1,165 @@
 package main
 
 import (
-	"encoding/json"
-	"github.com/KarenMirzayan/Project/pkg/messenger/models"
-	"github.com/gorilla/mux"
+	"errors"
+	"github.com/KarenMirzayan/Project/pkg/messenger/validator"
 	"net/http"
-	"strconv"
+	"time"
 )
 
-func (app *application) respondWithError(w http.ResponseWriter, code int, message string) {
-	app.respondWithJSON(w, code, map[string]string{"error": message})
-}
+package main
 
-func (app *application) respondWithJSON(w http.ResponseWriter, code int, payload interface{}) {
-	response, err := json.Marshal(payload)
+import (
+"errors"
+"net/http"
+"time"
 
-	if err != nil {
-		app.respondWithError(w, http.StatusInternalServerError, "500 Internal Server Error")
-		return
-	}
+"github.com/codev0/inft3212-6/pkg/abr-plus/model"
+"github.com/codev0/inft3212-6/pkg/abr-plus/validator"
+)
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(code)
-	_, err = w.Write(response)
-	if err != nil {
-		return
-	}
-}
-
-func (app *application) createUsersHandler(w http.ResponseWriter, r *http.Request) {
+func (app *application) registerUserHandler(w http.ResponseWriter, r *http.Request) {
+	// Create an anonymous struct to hold the expected data from the request body.
 	var input struct {
-		First       string `json:"firstname"`
-		Last        string `json:"lastname"`
-		DateOfBirth string `json:"date_of_birth"`
-		Login       string `json:"login"`
-		Password    string `json:"password"`
+		Name     string `json:"name"`
+		Email    string `json:"email"`
+		Password string `json:"password"`
+	}
+
+	// Parse the request body into the anonymous struct
+	err := app.readJSON(w, r, &input)
+	if err != nil {
+		app.badRequestResponse(w, r, err)
+		return
+	}
+
+	// Copy the data from the request body into a new User struct. Notice also that
+	// we set the Activated field to false, which isn't strictly necessary because
+	// the Activated field will have the zero-value of false by default. But setting
+	// this explicitly helps to make our intentions clear to anyone reading the code.
+	user := &model.User{
+		Name:  input.Name,
+		Email: input.Email,
+	}
+
+	// Use the Password.Set() method to generate and store the hashed and plaintext
+	// passwords.
+	err = user.Password.Set(input.Password)
+	if err != nil {
+		app.serverErrorResponse(w, r, err)
+		return
+	}
+
+	v := validator.New()
+
+	// Validate the user struct and return the error messages to the client if
+	// any of the checks fail.
+	if model.ValidateUser(v, user); !v.Valid() {
+		app.failedValidationResponse(w, r, v.Errors)
+		return
+	}
+
+	// Insert the user data into the database.
+	err = app.models.Users.Insert(user)
+	if err != nil {
+		switch {
+		// If we get an ErrDuplicateEmail error, use the v.AddError() method to manually add
+		// a message to the validator instance, and then call our failedValidationResponse
+		// helper().
+		case errors.Is(err, model.ErrDuplicateEmail):
+			v.AddError("email", "a user with this email address already exists")
+
+			app.failedValidationResponse(w, r, v.Errors)
+		default:
+			app.serverErrorResponse(w, r, err)
+		}
+		return
+	}
+
+	err = app.models.Permissions.AddForUser(user.ID, "menus:read")
+	if err != nil {
+		app.serverErrorResponse(w, r, err)
+		return
+	}
+
+	// After the user record has been created in the database, generate a new activation
+	// token for the user.
+	token, err := app.models.Tokens.New(user.ID, 3*24*time.Hour, model.ScopeActivation)
+	if err != nil {
+		app.serverErrorResponse(w, r, err)
+		return
+	}
+
+	var res struct {
+		Token *string     `json:"token"`
+		User  *model.User `json:"user"`
+	}
+
+	res.Token = &token.Plaintext
+	res.User = user
+
+	app.writeJSON(w, http.StatusCreated, envelope{"user": res}, nil)
+}
+
+// activateUserHandler activates a user by setting 'activation = true' using the provided
+// activation token in the request body.
+func (app *application) activateUserHandler(w http.ResponseWriter, r *http.Request) {
+	// Parse the plaintext activation token from the request body
+	var input struct {
+		TokenPlaintext string `json:"token"`
 	}
 
 	err := app.readJSON(w, r, &input)
 	if err != nil {
-		app.respondWithError(w, http.StatusBadRequest, "Invalid request payload")
+		app.badRequestResponse(w, r, err)
 		return
 	}
 
-	users := &models.Users{
-		First:       input.First,
-		Last:        input.Last,
-		DateOfBirth: input.DateOfBirth,
-		Login:       input.Login,
-		Password:    input.Password,
+	// Validate the plaintext token provided by the client.
+	v := validator.New()
+
+	if model.ValidateTokenPlaintext(v, input.TokenPlaintext); !v.Valid() {
+		app.failedValidationResponse(w, r, v.Errors)
+		return
 	}
 
-	err = app.models.Users.Insert(users)
+	// Retrieve the details of the user associated with the token using the GetForToken() method.
+	// If no matching record is found, then we let the client know that the token they provided
+	// is not valid.
+	user, err := app.models.Users.GetForToken(model.ScopeActivation, input.TokenPlaintext)
 	if err != nil {
-		app.respondWithError(w, http.StatusInternalServerError, err.Error())
+		switch {
+		case errors.Is(err, model.ErrRecordNotFound):
+			v.AddError("token", "invalid or expired activation token")
+			app.failedValidationResponse(w, r, v.Errors)
+		default:
+			app.serverErrorResponse(w, r, err)
+		}
 		return
 	}
 
-	app.respondWithJSON(w, http.StatusCreated, users)
-}
+	// Update the user's activation status.
+	user.Activated = true
 
-func (app *application) getUsersHandler(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	param := vars["userId"]
-
-	id, err := strconv.Atoi(param)
-	if err != nil || id < 1 {
-		app.respondWithError(w, http.StatusBadRequest, "Invalid user ID")
-		return
-	}
-
-	user, err := app.models.Users.Get(id)
-	if err != nil {
-		app.respondWithError(w, http.StatusNotFound, "404 Not Found")
-		return
-	}
-
-	app.respondWithJSON(w, http.StatusOK, user)
-}
-
-func (app *application) updateUsersHandler(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	param := vars["userId"]
-
-	id, err := strconv.Atoi(param)
-	if err != nil || id < 1 {
-		app.respondWithError(w, http.StatusBadRequest, "Invalid user ID")
-		return
-	}
-
-	user, err := app.models.Users.Get(id)
-	if err != nil {
-		app.respondWithError(w, http.StatusNotFound, "404 Not Found")
-		return
-	}
-
-	var input struct {
-		First       *string `json:"firstname"`
-		Last        *string `json:"lastname"`
-		DateOfBirth *string `json:"date_of_birth"`
-		Login       *string `json:"login"`
-		Password    *string `json:"password"`
-	}
-
-	err = app.readJSON(w, r, &input)
-	if err != nil {
-		app.respondWithError(w, http.StatusBadRequest, "Invalid request payload")
-		return
-	}
-
-	if input.First != nil {
-		user.First = *input.First
-	}
-
-	if input.Last != nil {
-		user.Last = *input.Last
-	}
-
-	if input.DateOfBirth != nil {
-		user.DateOfBirth = *input.DateOfBirth
-	}
-
-	if input.Login != nil {
-		user.Login = *input.Login
-	}
-
-	if input.Password != nil {
-		user.Password = *input.Password
-	}
-
+	// Save the updated user record in our database, checking for any edit conflicts in the same
+	// way that we did for our move records.
 	err = app.models.Users.Update(user)
 	if err != nil {
-		app.respondWithError(w, http.StatusInternalServerError, "500 Internal Server Error")
+		switch {
+		case errors.Is(err, model.ErrEditConflict):
+			app.editConflictResponse(w, r)
+		default:
+			app.serverErrorResponse(w, r, err)
+		}
 		return
 	}
 
-	app.respondWithJSON(w, http.StatusOK, user)
-}
-
-func (app *application) deleteUsersHandler(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	param := vars["userId"]
-
-	id, err := strconv.Atoi(param)
-	if err != nil || id < 1 {
-		app.respondWithError(w, http.StatusBadRequest, "Invalid user ID")
-		return
-	}
-
-	err = app.models.Users.Delete(id)
+	// If everything went successfully above, then delete all activation tokens for the user.
+	err = app.models.Tokens.DeleteAllForUser(model.ScopeActivation, user.ID)
 	if err != nil {
-		app.respondWithError(w, http.StatusInternalServerError, "500 Internal Server Error")
+		app.serverErrorResponse(w, r, err)
 		return
 	}
 
-	app.respondWithJSON(w, http.StatusOK, map[string]string{"result": "success"})
+	app.writeJSON(w, http.StatusOK, envelope{"user": user}, nil)
 }
-
-//func (app *application) readJSON(w http.ResponseWriter, r *http.Request, dst interface{}) error {
-//	dec := json.NewDecoder(r.Body)
-//	dec.DisallowUnknownFields()
-//
-//	err := dec.Decode(dst)
-//	if err != nil {
-//		return err
-//	}
-//
-//	return nil
-//}
