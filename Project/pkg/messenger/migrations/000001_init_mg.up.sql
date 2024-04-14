@@ -1,10 +1,13 @@
-create table if not exists users (
-                                     user_id serial primary key,
-                                     firstname text not null,
-                                     lastname text not null,
-                                     date_of_birth date not null,
-                                     login varchar(16) not null unique,
-                                     password varchar(16) not null
+create extension if not exists citext;
+
+CREATE TABLE IF NOT EXISTS users (
+                                     id bigserial PRIMARY KEY,
+                                     created_at timestamp(0) with time zone NOT NULL DEFAULT NOW(),
+                                     name text NOT NULL,
+                                     email citext UNIQUE NOT NULL,
+                                     password_hash bytea NOT NULL,
+                                     activated bool NOT NULL,
+                                     version integer NOT NULL DEFAULT 1
 );
 
 create table if not exists user_conversations (
