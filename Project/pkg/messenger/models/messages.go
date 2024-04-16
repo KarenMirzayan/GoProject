@@ -41,14 +41,14 @@ func (m MessagesModel) Get(conversationID, senderID, messageID string) (*Message
 	query := `
 		SELECT m.message_id, m.conversation_id, m.sender_id, m.content, m.timestamp
 		FROM messages m
-		INNER JOIN conversations c ON m.conversation_id = c.conversation_id
+		INNER JOIN user_conversations c ON m.conversation_id = c.conversation_id
 		WHERE m.conversation_id = $1 AND m.message_id = $2 AND (c.user_id = $3 OR c.friend_id = $3);
 	`
 	var messages Messages
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
-	row := m.DB.QueryRowContext(ctx, query, conversationID, senderID, messageID)
+	row := m.DB.QueryRowContext(ctx, query, conversationID, messageID, senderID)
 	err := row.Scan(&messages.MessageId, &messages.ConversationId, &messages.SenderId, &messages.Content, &messages.Timestamp)
 	if err != nil {
 		return nil, err
@@ -61,14 +61,14 @@ func (m MessagesModel) Update(messages *Messages) error {
 	query := `
 		UPDATE messages m
 		SET content = $1
-		FROM conversations c
+		FROM user_conversations c
 		WHERE m.conversation_id = c.conversation_id 
 		AND m.conversation_id = $2 
 		AND m.message_id = $3
 		AND (c.user_id = $4 OR c.friend_id = $4)
 		RETURNING m.message_id, m.conversation_id, m.sender_id, m.content, m.timestamp
 	`
-	args := []interface{}{messages.Content, messages.ConversationId, messages.SenderId, messages.MessageId}
+	args := []interface{}{messages.Content, messages.ConversationId, messages.MessageId, messages.SenderId}
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
@@ -84,7 +84,7 @@ func (m MessagesModel) Delete(conversationID, senderID, messageID string) error 
 	// Delete a specific menu item from the database.
 	query := `
 		DELETE FROM messages
-		WHERE conversation_id = $1 AND sender_id = $2 AND (c.user_id = $3 OR c.friend_id = $3);
+		WHERE conversation_id = $1 AND sender_id = $2 AND message_id = $3;
 	`
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()

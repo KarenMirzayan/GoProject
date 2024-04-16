@@ -12,9 +12,16 @@ import (
 
 import "time"
 
-func (app *application) createMessageHandler(w http.ResponseWriter, r *http.Request) {
+func (app *application) createMessageHandler(w http.ResponseWriter, r *http.Request) { //TODO: get sender_id from url
 	params := mux.Vars(r)
 	conversationID := params["conversationId"]
+	userID, err := strconv.Atoi(params["userId"])
+
+	if err != nil {
+		log.Println(err)
+		app.errorResponse(w, r, http.StatusBadRequest, "Invalid request payload")
+		return
+	}
 
 	// Define a struct to hold JSON input data
 	var input struct {
@@ -23,7 +30,7 @@ func (app *application) createMessageHandler(w http.ResponseWriter, r *http.Requ
 	}
 
 	// Read JSON input into the struct
-	err := app.readJSON(w, r, &input)
+	err = app.readJSON(w, r, &input)
 	if err != nil {
 		log.Println(err)
 		app.errorResponse(w, r, http.StatusBadRequest, "Invalid request payload")
@@ -42,7 +49,7 @@ func (app *application) createMessageHandler(w http.ResponseWriter, r *http.Requ
 	// Create a new Message instance with the input data, conversation_id, and generated timestamp
 	message := &models.Messages{
 		ConversationId: conversationID,
-		SenderId:       input.SenderID,
+		SenderId:       userID,
 		Content:        input.Content,
 		Timestamp:      timestamp,
 	}
