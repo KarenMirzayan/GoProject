@@ -80,16 +80,16 @@ func (m ConversationsModel) Get(userId, conversationId int) (*Conversations, err
 	return &conversations, nil
 }
 
-func (m ConversationsModel) Delete(userId, conversationId int) error {
+func (m ConversationsModel) Delete(userCheck, userId, conversationId int) error {
 	// Delete a specific user item from the database.
 	query := `
 		DELETE FROM user_conversations
-		WHERE conversation_id = $1 AND (user_id = $2 OR friend_id = $2);
+		WHERE conversation_id = $1 AND (user_id = $3 OR friend_id = $3) AND (user_id = $2 OR friend_id = $2);
 		`
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
-	_, err := m.DB.ExecContext(ctx, query, conversationId, userId)
+	_, err := m.DB.ExecContext(ctx, query, conversationId, userId, userCheck)
 	return err
 }
 

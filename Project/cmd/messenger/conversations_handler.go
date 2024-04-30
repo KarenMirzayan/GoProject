@@ -42,10 +42,15 @@ func (app *application) getConversationsHandler(w http.ResponseWriter, r *http.R
 
 func (app *application) createConversationHandler(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
+	user := app.contextGetUser(r)
 	userID, err := strconv.Atoi(params["userId"])
 	if err != nil {
 		app.errorResponse(w, r, http.StatusBadRequest, "Invalid user ID")
 		return
+	}
+
+	if int(user.ID) != userID {
+		app.errorResponse(w, r, http.StatusUnauthorized, "Wrong token")
 	}
 
 	var input struct {
@@ -102,6 +107,7 @@ func (app *application) getConversationHandler(w http.ResponseWriter, r *http.Re
 
 func (app *application) deleteConversationHandler(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
+	user := app.contextGetUser(r)
 	userID, err := strconv.Atoi(params["userId"])
 	if err != nil {
 		app.errorResponse(w, r, http.StatusBadRequest, "Invalid user ID")
@@ -112,9 +118,8 @@ func (app *application) deleteConversationHandler(w http.ResponseWriter, r *http
 		app.errorResponse(w, r, http.StatusBadRequest, "Invalid conversation ID")
 		return
 	}
-
 	// Delete the conversation from the database.
-	err = app.models.Conversations.Delete(userID, conversationID)
+	err = app.models.Conversations.Delete(int(user.ID), userID, conversationID)
 	if err != nil {
 		switch {
 		case errors.Is(err, models.ErrRecordNotFound):
