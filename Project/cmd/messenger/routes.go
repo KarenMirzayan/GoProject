@@ -17,8 +17,8 @@ func (app *application) routes() http.Handler {
 	// error handler for 405 Method Not Allowed responses
 	r.MethodNotAllowedHandler = http.HandlerFunc(app.methodNotAllowedResponse)
 
-	// healthcheck
-	//r.HandleFunc("/api/v1/healthcheck", app.healthcheckHandler).Methods("GET")
+	//healthcheck
+	r.HandleFunc("/api/v1/healthcheck", app.healthcheckHandler).Methods("GET")
 
 	v1 := r.PathPrefix("/api/v1").Subrouter()
 
