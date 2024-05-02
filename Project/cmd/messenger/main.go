@@ -124,7 +124,7 @@ func openDB(cfg config) (*sql.DB, error) {
 		err = m.Up()
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "e5: %v\n", err)
-			return nil, err
+			//return nil, err
 		}
 
 	}
