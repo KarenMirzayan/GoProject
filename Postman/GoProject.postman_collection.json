@@ -1,0 +1,1079 @@
+{
+	"info": {
+		"_postman_id": "d6375960-5330-40aa-8fea-a8304ccb6d1d",
+		"name": "GoProject",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "34090185"
+	},
+	"item": [
+		{
+			"name": "Meta",
+			"item": [
+				{
+					"name": "Healthcheck",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"console.log(\"health check test\")",
+									"",
+									"pm.test('server is fine', () => {",
+									"    pm.response.to.have.status(200)",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/v1/healthcheck",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"healthcheck"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Register",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const randomId = Math.random().toString(36).substring(2, 10);",
+									"pm.environment.set(\"email\", `${randomId}@example.com`);",
+									"pm.environment.set(\"password\", `password${randomId}`);",
+									"pm.environment.set(\"name\", `Name-${randomId}`);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const responseData = pm.response.json();",
+									"pm.environment.set(\"user_id\", responseData.user.user.id);",
+									"pm.environment.set(\"activationToken\", responseData.user.token);",
+									"",
+									"pm.test('response is ok', () => {",
+									"\tpm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test('response should have json with activationToken', () => {",
+									"\tconst response = pm.response.json();",
+									"",
+									"\t// Check that field in response",
+									"\tpm.expect(response.user.token).to.be.a('string'); // Fixed the test by changing 'to.be.string' to 'to.be.a('string')'",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"email\": \"{{email}}\",\r\n  \"password\": \"{{password}}\",\r\n  \"name\": \"{{name}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/v1/users",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Activate",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('response is ok', () => {",
+									"\tpm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('user should be activated', () => {",
+									"\tconst response = pm.response.json();",
+									"",
+									"\t// Check that field in response",
+									"\tpm.expect(response.user.activated).to.be.true;",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const activationToken = pm.environment.get(\"activationToken\")"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"token\": \"{{activationToken}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/v1/users/activated",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"activated"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const res = pm.response.json();",
+									"",
+									"pm.test('response is ok', () => {",
+									"\tpm.response.to.have.status(201);",
+									"});",
+									"",
+									"const token = res.authentication_token.token;",
+									"",
+									"pm.test('response should have json with auth token', () => {",
+									"\t// Check that field in response",
+									"\tpm.expect(token).to.be.string;",
+									"});",
+									"",
+									"pm.environment.set(\"token\", token);",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"{{email}}\",\n    \"password\": \"{{password}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/v1/users/login",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"login"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Conversation",
+			"item": [
+				{
+					"name": "Create Conversation 1",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const token = pm.environment.get(\"token\");\r",
+									"pm.request.headers.add({\r",
+									"    key: \"Authorization\",\r",
+									"    value: \"Bearer \" + token\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"response is ok\", () => {\r",
+									"    pm.response.to.have.status(201)\r",
+									"})\r",
+									"\r",
+									"const conversation = pm.response.json().conversation\r",
+									"\r",
+									"pm.test(\"has neccessary values\", () => {\r",
+									"    conversation.to.have(\"conversation_id\");\r",
+									"    conversation.to.have(\"user_id\")\r",
+									"    conversation.to.have(\"friend_id\")\r",
+									"})\r",
+									"\r",
+									"pm.environment.set(\"conversation_id\", conversation.conversation_id)"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"friend_id\": 1\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/v1/users/{{user_id}}/conversations",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"{{user_id}}",
+								"conversations"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Conversation 2",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const token = pm.environment.get(\"token\");\r",
+									"pm.request.headers.add({\r",
+									"    key: \"Authorization\",\r",
+									"    value: \"Bearer \" + token\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"response is ok\", () => {\r",
+									"    pm.response.to.have.status(201)\r",
+									"})\r",
+									"\r",
+									"const conversation = pm.response.json().conversation\r",
+									"\r",
+									"pm.test(\"has neccessary values\", () => {\r",
+									"    conversation.to.have(\"conversation_id\");\r",
+									"    conversation.to.have(\"user_id\")\r",
+									"    conversation.to.have(\"friend_id\")\r",
+									"})\r",
+									"\r",
+									"pm.environment.set(\"conversation_id_2\", conversation.conversation_id)\r",
+									"pm.environment.set(\"friend_id\", conversation.friend_id)"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"friend_id\": 5\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/v1/users/{{user_id}}/conversations",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"{{user_id}}",
+								"conversations"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Conversations List",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"response is ok\", () => {\r",
+									"    pm.response.to.have.status(200)\r",
+									"})\r",
+									"\r",
+									"pm.test(\"returns array of conversations\", () => {\r",
+									"    const conversations = pm.response.json().conversations\r",
+									"    pm.expect(conversations).to.be.an.instanceOf(Array);\r",
+									"})\r",
+									"\r",
+									"pm.test(\"has metadata\", () => {\r",
+									"    const metadata = pm.response.json().metadata\r",
+									"    pm.expect(metadata).to.be.not.NaN\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/v1/users/{{user_id}}/conversations",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"{{user_id}}",
+								"conversations"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Conversations List Sorted",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.request.addQueryParams(\"sort=-conversation_id\");"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"response is ok\", () => {",
+									"    pm.response.to.have.status(200)",
+									"})",
+									"",
+									"pm.test(\"returns array of conversations\", () => {",
+									"    const conversations = pm.response.json().conversations",
+									"    pm.expect(conversations).to.be.an.instanceOf(Array);",
+									"})",
+									"",
+									"pm.test(\"has metadata\", () => {",
+									"    const metadata = pm.response.json().metadata",
+									"    pm.expect(metadata).to.be.not.NaN",
+									"})",
+									"",
+									"pm.test('should be sorted descendent', () => {",
+									"\tconst response = pm.response.json();",
+									"\tpm.expect(response.conversations[0].conversation_id > response.conversations[response.conversations.length - 1].conversation_id).to.be.true;",
+									"});",
+									"",
+									"",
+									"",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/v1/users/{{user_id}}/conversations",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"{{user_id}}",
+								"conversations"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Conversation",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"response is ok\", () => {\r",
+									"    pm.response.to.have.status(200)\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/v1/users/{{user_id}}/conversations/{{conversation_id}}",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"{{user_id}}",
+								"conversations",
+								"{{conversation_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Conversation",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"response is ok\", () => {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"has success message\", () => {\r",
+									"    const response = pm.response.json();\r",
+									"    pm.expect(response.message).to.equal(\"success\");\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const token = pm.environment.get(\"token\");\r",
+									"pm.request.headers.add({\r",
+									"    key: \"Authorization\",\r",
+									"    value: \"Bearer \" + token\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/v1/users/{{user_id}}/conversations/{{conversation_id}}",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"{{user_id}}",
+								"conversations",
+								"{{conversation_id}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Message",
+			"item": [
+				{
+					"name": "Create Message 1",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"response is ok\", () => {\r",
+									"    pm.response.to.have.status(201)\r",
+									"})\r",
+									"\r",
+									"const message = pm.response.json().message\r",
+									"\r",
+									"pm.test(\"has necessary values\", () => {\r",
+									"    pm.expect(message).to.have.property(\"message_id\");\r",
+									"    pm.expect(message).to.have.property(\"conversation_id\");\r",
+									"    pm.expect(message).to.have.property(\"sender_id\");\r",
+									"    pm.expect(message).to.have.property(\"content\");\r",
+									"    pm.expect(message).to.have.property(\"timestamp\");\r",
+									"});\r",
+									"\r",
+									"pm.environment.set(\"message_id\", message.message_id)"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"content\": \"Hello!\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/v1/users/{{user_id}}/conversations/{{conversation_id_2}}/messages",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"{{user_id}}",
+								"conversations",
+								"{{conversation_id_2}}",
+								"messages"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Message 2",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"response is ok\", () => {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"const message = pm.response.json().message;",
+									"",
+									"pm.test(\"has necessary values\", () => {",
+									"    pm.expect(message).to.have.property(\"message_id\");",
+									"    pm.expect(message).to.have.property(\"conversation_id\");",
+									"    pm.expect(message).to.have.property(\"sender_id\");",
+									"    pm.expect(message).to.have.property(\"content\");",
+									"    pm.expect(message).to.have.property(\"timestamp\");",
+									"});",
+									"",
+									"pm.environment.set(\"message_id_2\", message.message_id);",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"content\": \"Privet!\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/v1/users/{{friend_id}}/conversations/{{conversation_id_2}}/messages",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"{{friend_id}}",
+								"conversations",
+								"{{conversation_id_2}}",
+								"messages"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Messages List",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const res = pm.response.json();",
+									"",
+									"pm.test('response is ok', () => {",
+									"\tpm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('should respond with list', () => {",
+									"\tpm.expect(res.messages).to.be.an.instanceOf(Array);",
+									"});",
+									"",
+									"pm.test(\"has metadata\", () => {",
+									"    const metadata = pm.response.json().metadata",
+									"    pm.expect(metadata).to.be.not.NaN",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/v1/users/{{friend_id}}/conversations/{{conversation_id_2}}/messages",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"{{friend_id}}",
+								"conversations",
+								"{{conversation_id_2}}",
+								"messages"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Messages List Filtered",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.request.addQueryParams(\"query=H&sort=timestamp\");"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const res = pm.response.json();",
+									"",
+									"pm.test('response is ok', () => {",
+									"\tpm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('should respond with list', () => {",
+									"\tpm.expect(res.messages).to.be.an.instanceOf(Array);",
+									"});",
+									"",
+									"pm.test(\"has metadata\", () => {",
+									"    const metadata = res.metadata",
+									"    pm.expect(metadata).to.be.not.NaN",
+									"})",
+									"",
+									"pm.test(\"has one message\", () => {",
+									"    const messages = res.messages",
+									"    pm.expect(messages.length === 1).to.be.true",
+									"})",
+									"",
+									"",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/v1/users/{{friend_id}}/conversations/{{conversation_id_2}}/messages",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"{{friend_id}}",
+								"conversations",
+								"{{conversation_id_2}}",
+								"messages"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Message",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"response is ok\", () => {\r",
+									"    pm.response.to.have.status(200)\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/v1/users/{{friend_id}}/conversations/{{conversation_id_2}}/messages/{{message_id}}",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"{{friend_id}}",
+								"conversations",
+								"{{conversation_id_2}}",
+								"messages",
+								"{{message_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"response is ok\", () => {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"data changed\", () => {\r",
+									"    const res = pm.response.json();\r",
+									"    const message = pm.variables.get(\"message\")\r",
+									"    pm.expect(message === res.message.content).to.be.true;\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const randomId = Math.random().toString(36).substring(2, 10);\r",
+									"pm.environment.set(\"message\", `${randomId}`);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"content\": \"{{message}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/v1/users/{{user_id}}/conversations/{{conversation_id_2}}/messages/{{message_id_2}}",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"{{user_id}}",
+								"conversations",
+								"{{conversation_id_2}}",
+								"messages",
+								"{{message_id_2}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Message",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"response is ok\", () => {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"has success message\", () => {\r",
+									"    const response = pm.response.json();\r",
+									"    pm.expect(response.message).to.equal(\"success\");\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/v1/users/{{friend_id}}/conversations/{{conversation_id_2}}/messages/{{message_id_2}}",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"{{friend_id}}",
+								"conversations",
+								"{{conversation_id_2}}",
+								"messages",
+								"{{message_id_2}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
