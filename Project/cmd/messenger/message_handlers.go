@@ -70,12 +70,11 @@ func (app *application) getMessageHandler(w http.ResponseWriter, r *http.Request
 	params := mux.Vars(r)
 	userID := params["userId"]
 	conversationID := params["conversationId"]
-	messageID := params["id"]
+	messageID := params["messageId"]
 
 	// Query the database for the message using its IDs
 	message, err := app.models.Messages.Get(conversationID, userID, messageID)
 	if err != nil {
-		// Handle different error scenarios
 		switch {
 		case errors.Is(err, models.ErrRecordNotFound):
 			app.notFoundResponse(w, r)
@@ -94,7 +93,7 @@ func (app *application) updateMessageHandler(w http.ResponseWriter, r *http.Requ
 	params := mux.Vars(r)
 	userID := params["userId"]
 	conversationID := params["conversationId"]
-	messageID := params["id"]
+	messageID := params["messageId"]
 
 	// Query the database for the message using its IDs
 	message, err := app.models.Messages.Get(conversationID, userID, messageID)
@@ -153,7 +152,7 @@ func (app *application) deleteMessageHandler(w http.ResponseWriter, r *http.Requ
 	params := mux.Vars(r)
 	userID := params["userId"]
 	conversationID := params["conversationId"]
-	messageID := params["id"]
+	messageID := params["messageId"]
 
 	// Delete the message from the database
 	err := app.models.Messages.Delete(conversationID, userID, messageID)
@@ -196,10 +195,8 @@ func (app *application) getMessagesList(w http.ResponseWriter, r *http.Request) 
 	input.Filters.Page = app.readInt(qs, "page", 1, v)
 	input.Filters.PageSize = app.readInt(qs, "page_size", 20, v)
 	input.Filters.Sort = app.readStrings(qs, "sort", "timestamp")
-
-	// Add supported sort values to the sort safelist
 	input.Filters.SortSafeList = []string{
-		"-timestamp", "timestamp", // sort by timestamp ascending or descending
+		"-timestamp", "timestamp",
 	}
 
 	// Validate input parameters and filters

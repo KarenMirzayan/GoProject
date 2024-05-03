@@ -44,9 +44,9 @@ func main() {
 	var (
 		cfg        config
 		migrations = fs.String("migrations", "", "Path to migration files folder. If not provided, migrations do not applied")
-		port       = fs.Int("port", 8080, "API server port")
+		port       = fs.Int("port", 8081, "API server port")
 		env        = fs.String("env", "development", "Environment (development|staging|production)")
-		dbDsn      = fs.String("dsn", "postgres://beezy:2202264mir@localhost:5432/messenger?sslmode=disable", "PostgreSQL DSN")
+		dbDsn      = fs.String("dsn", "postgres://beezy:2202264mir@localhost:5433/messenger?sslmode=disable", "PostgreSQL DSN")
 	)
 
 	// Init logger
