@@ -5,7 +5,8 @@ FROM golang:1.22.1 as builder
 WORKDIR /app
 
 # Copy go mod and sum files
-COPY go.mod go.sum ./
+COPY go.mod ./
+COPY go.sum ./
 
 # Copy migration files
 
