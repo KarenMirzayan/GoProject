@@ -80,17 +80,24 @@ func (app *application) deleteChannelHandler(w http.ResponseWriter, r *http.Requ
 	params := mux.Vars(r)
 	user := app.contextGetUser(r)
 	userID, err := strconv.Atoi(params["userId"])
+
 	if err != nil {
 		app.errorResponse(w, r, http.StatusBadRequest, "Invalid user ID")
 		return
 	}
+
+	if int(user.ID) != userID {
+		app.errorResponse(w, r, http.StatusUnauthorized, "Wrong token")
+	}
+
 	channelID, err := strconv.Atoi(params["channelId"])
 	if err != nil {
 		app.errorResponse(w, r, http.StatusBadRequest, "Invalid conversation ID")
 		return
 	}
+
 	// Delete the conversation from the database.
-	err = app.models.Channels.Delete(int(user.ID), userID, channelID)
+	err = app.models.Channels.Delete(userID, channelID)
 	if err != nil {
 		switch {
 		case errors.Is(err, models.ErrRecordNotFound):

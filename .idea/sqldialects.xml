@@ -2,8 +2,11 @@
 <project version="4">
   <component name="SqlDialectMappings">
     <file url="file://$PROJECT_DIR$/Project/pkg/messenger/migrations/000001_init_mg.up.sql" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/Project/pkg/messenger/models/channels.go" dialect="PostgreSQL" />
     <file url="file://$PROJECT_DIR$/Project/pkg/messenger/models/conversations.go" dialect="PostgreSQL" />
     <file url="file://$PROJECT_DIR$/Project/pkg/messenger/models/messages.go" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/Project/pkg/messenger/models/permissions.go" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/Project/pkg/messenger/models/tokens.go" dialect="PostgreSQL" />
     <file url="file://$PROJECT_DIR$/Project/pkg/messenger/models/users.go" dialect="PostgreSQL" />
   </component>
 </project>

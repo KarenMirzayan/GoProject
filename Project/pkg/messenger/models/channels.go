@@ -20,7 +20,7 @@ type ChannelsModel struct {
 	ErrorLog *log.Logger
 }
 
-func (m ChannelsModel) Insert(channels *Channels) error {
+func (c ChannelsModel) Insert(channels *Channels) error {
 	// Insert a new user item into the database.
 	query := `
 		INSERT INTO channels (user_id, name) 
@@ -31,11 +31,11 @@ func (m ChannelsModel) Insert(channels *Channels) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
-	return m.DB.QueryRowContext(ctx, query, args...).Scan(&channels.ChannelId, &channels.UserId,
+	return c.DB.QueryRowContext(ctx, query, args...).Scan(&channels.ChannelId, &channels.UserId,
 		&channels.Name)
 }
 
-func (m ChannelsModel) Get(userId, channelId int) (*Channels, error) {
+func (c ChannelsModel) Get(userId, channelId int) (*Channels, error) {
 	query := `
 		SELECT channel_id, user_id, name
 		FROM channels
@@ -45,7 +45,7 @@ func (m ChannelsModel) Get(userId, channelId int) (*Channels, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
-	row := m.DB.QueryRowContext(ctx, query, channelId, userId)
+	row := c.DB.QueryRowContext(ctx, query, channelId, userId)
 	err := row.Scan(&channels.ChannelId, &channels.UserId, &channels.Name)
 	if err != nil {
 		return nil, err
@@ -53,7 +53,7 @@ func (m ChannelsModel) Get(userId, channelId int) (*Channels, error) {
 	return &channels, nil
 }
 
-func (m ChannelsModel) Delete(userCheck, userId, channelId int) error {
+func (c ChannelsModel) Delete(userId, channelId int) error {
 	// Delete a specific user item from the database.
 	query := `
 		DELETE FROM channels
@@ -62,7 +62,7 @@ func (m ChannelsModel) Delete(userCheck, userId, channelId int) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
-	_, err := m.DB.ExecContext(ctx, query, channelId, userId, userCheck)
+	_, err := c.DB.ExecContext(ctx, query, channelId, userId)
 	return err
 }
 
@@ -87,9 +87,7 @@ func (c ChannelsModel) Update(channel *Channels) error {
 }
 
 func ValidateChannel(v *validator.Validator, channel *Channels) {
-	// Check if the name field is empty.
 	v.Check(channel.Name != "", "name", "must be provided")
-	// Add additional validation rules as needed.
 }
 
 func (c ChannelsModel) GetAll(userId int) ([]*Channels, error) {

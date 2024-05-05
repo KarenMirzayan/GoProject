@@ -42,15 +42,13 @@ func (app *application) routes() http.Handler {
 	// Get all messages of conversation
 	v1.HandleFunc("/users/{userId:[0-9]+}/conversations/{conversationId:[0-9]+}/messages", app.getMessagesList).Methods("GET")
 
-	v1.HandleFunc("/users/{userId:[0-9]+}/channels", app.createMessageHandler).Methods("POST")
+	v1.HandleFunc("/users/{userId:[0-9]+}/channels", app.requirePermissions("conversation:write", app.createChannelHandler)).Methods("POST")
 	// Get a specific message
-	v1.HandleFunc("/users/{userId:[0-9]+}/channels/{channelId:[0-9]+}", app.getMessageHandler).Methods("GET")
+	v1.HandleFunc("/users/{userId:[0-9]+}/channels/{channelId:[0-9]+}", app.getChannelHandler).Methods("GET")
 	//Update a specific message
-	v1.HandleFunc("/users/{userId:[0-9]+}/channels/{channelId:[0-9]+}", app.updateMessageHandler).Methods("PUT")
+	v1.HandleFunc("/users/{userId:[0-9]+}/channels/{channelId:[0-9]+}", app.updateChannelHandler).Methods("PUT")
 	// Delete a specific message
-	v1.HandleFunc("/users/{userId:[0-9]+}/channels/{channelId:[0-9]+}", app.deleteMessageHandler).Methods("DELETE")
-	// Get all messages of conversation
-	v1.HandleFunc("/users/{userId:[0-9]+}/channels", app.getMessagesList).Methods("GET")
+	v1.HandleFunc("/users/{userId:[0-9]+}/channels/{channelId:[0-9]+}", app.requirePermissions("conversation:write", app.deleteChannelHandler)).Methods("DELETE")
 
 	v1.HandleFunc("/users", app.registerUserHandler).Methods("POST")
 	v1.HandleFunc("/users/activated", app.activateUserHandler).Methods("PUT")

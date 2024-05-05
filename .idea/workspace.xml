@@ -5,16 +5,19 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="0b714e4c-21fe-4efe-8160-a259937fc167" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources.local.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.local.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/dataSources/07ccae91-3194-4b35-8ae1-2076ddfea1e6.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/07ccae91-3194-4b35-8ae1-2076ddfea1e6.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/dataSources/07ccae91-3194-4b35-8ae1-2076ddfea1e6/storage_v2/_src_/database/messenger.E7tmqg/schema/information_schema.FNRwLQ.meta" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/07ccae91-3194-4b35-8ae1-2076ddfea1e6/storage_v2/_src_/database/messenger.E7tmqg/schema/information_schema.FNRwLQ.meta" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/dataSources/07ccae91-3194-4b35-8ae1-2076ddfea1e6/storage_v2/_src_/database/messenger.E7tmqg/schema/pg_catalog.0S1ZNQ.meta" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/07ccae91-3194-4b35-8ae1-2076ddfea1e6/storage_v2/_src_/database/messenger.E7tmqg/schema/pg_catalog.0S1ZNQ.meta" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/dataSources/07ccae91-3194-4b35-8ae1-2076ddfea1e6/storage_v2/_src_/database/messenger.E7tmqg/schema/public.abK9xQ.meta" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/07ccae91-3194-4b35-8ae1-2076ddfea1e6/storage_v2/_src_/database/messenger.E7tmqg/schema/public.abK9xQ.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources/07ccae91-3194-4b35-8ae1-2076ddfea1e6/storage_v2/_src_/database/postgres.edMnLQ/schema/public.abK9xQ.meta" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/07ccae91-3194-4b35-8ae1-2076ddfea1e6/storage_v2/_src_/database/postgres.edMnLQ/schema/public.abK9xQ.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/sqldialects.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/sqldialects.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Project/cmd/messenger/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/Project/cmd/messenger/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Project/cmd/messenger/middleware.go" beforeDir="false" afterPath="$PROJECT_DIR$/Project/cmd/messenger/middleware.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Project/cmd/messenger/channel_handlers.go" beforeDir="false" afterPath="$PROJECT_DIR$/Project/cmd/messenger/channel_handlers.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Project/cmd/messenger/routes.go" beforeDir="false" afterPath="$PROJECT_DIR$/Project/cmd/messenger/routes.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Project/cmd/messenger/user_handlers.go" beforeDir="false" afterPath="$PROJECT_DIR$/Project/cmd/messenger/user_handlers.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Project/pkg/messenger/migrations/000001_init_mg.up.sql" beforeDir="false" afterPath="$PROJECT_DIR$/Project/pkg/messenger/migrations/000001_init_mg.up.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Project/pkg/messenger/models/channels.go" beforeDir="false" afterPath="$PROJECT_DIR$/Project/pkg/messenger/models/channels.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -27,6 +30,9 @@
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="ProjectErrors" />
   </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 4
@@ -46,19 +52,26 @@
     &quot;git-widget-placeholder&quot;: &quot;main&quot;,
     &quot;go.import.settings.migrated&quot;: &quot;true&quot;,
     &quot;go.sdk.automatically.set&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/k_mir/OneDrive/Рабочий стол/GoProject/Project/cmd/messenger&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/k_mir/OneDrive/Рабочий стол/GoProject/Project/pkg/messenger/models&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
     &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;settings.qodana&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  },
+  &quot;keyToStringList&quot;: {
+    &quot;DatabaseDriversLRU&quot;: [
+      &quot;postgresql&quot;
+    ]
   }
 }</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
-      <recent name="C:\Users\k_mir\OneDrive\Рабочий стол\GoProject\Project\cmd\messenger" />
       <recent name="C:\Users\k_mir\OneDrive\Рабочий стол\GoProject\Project\pkg\messenger\models" />
+      <recent name="C:\Users\k_mir\OneDrive\Рабочий стол\GoProject\Project" />
+      <recent name="C:\Users\k_mir\OneDrive\Рабочий стол\GoProject\Project\cmd\messenger" />
       <recent name="C:\Users\k_mir\OneDrive\Рабочий стол\GoProject" />
     </key>
   </component>
@@ -110,6 +123,11 @@
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="UnknownFeatures">
+    <option featureType="dependencySupport" implementationName="executable:docker" />
+    <option featureType="com.intellij.configurationType" implementationName="PythonConfigurationType" />
+    <option featureType="dependencySupport" implementationName="executable:kubectl" />
   </component>
   <component name="VgoProject">
     <settings-migrated>true</settings-migrated>
