@@ -32,6 +32,14 @@ create table if not exists messages
     foreign key (sender_id) references users (id) on delete cascade
 );
 
+create table if not exists channels
+(
+    channel_id      serial primary key,
+    user_id int,
+    name text,
+    foreign key (user_id) references users (id) on delete cascade
+);
+
 CREATE TABLE IF NOT EXISTS tokens
 (
     hash    BYTEA PRIMARY KEY,

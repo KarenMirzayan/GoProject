@@ -19,6 +19,7 @@ type Models struct {
 	Users         UserModel
 	Conversations ConversationsModel
 	Messages      MessagesModel
+	Channels      ChannelsModel
 	Tokens        TokenModel
 	Permissions   PermissionModel
 }
@@ -38,6 +39,11 @@ func NewModels(db *sql.DB) Models {
 			ErrorLog: errorLog,
 		},
 		Messages: MessagesModel{
+			DB:       db,
+			InfoLog:  infoLog,
+			ErrorLog: errorLog,
+		},
+		Channels: ChannelsModel{
 			DB:       db,
 			InfoLog:  infoLog,
 			ErrorLog: errorLog,
