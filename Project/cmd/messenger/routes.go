@@ -49,6 +49,7 @@ func (app *application) routes() http.Handler {
 	v1.HandleFunc("/users/{userId:[0-9]+}/channels/{channelId:[0-9]+}", app.updateChannelHandler).Methods("PUT")
 	// Delete a specific message
 	v1.HandleFunc("/users/{userId:[0-9]+}/channels/{channelId:[0-9]+}", app.requirePermissions("conversation:write", app.deleteChannelHandler)).Methods("DELETE")
+	v1.HandleFunc("/users/{userId:[0-9]+}/channels", app.getChannelsList).Methods("GET")
 
 	v1.HandleFunc("/users", app.registerUserHandler).Methods("POST")
 	v1.HandleFunc("/users/activated", app.activateUserHandler).Methods("PUT")
